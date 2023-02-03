@@ -34,3 +34,24 @@ export const getInitialData = () => {
     dispatch(packagesActions.loadPackages(packageData));
   };
 };
+
+export const sendOrderData = (order) => {
+  const sendData = async () => {
+    const response = await fetch(
+      "https://react-http-2156a-default-rtdb.europe-west1.firebasedatabase.app/cVhomework.json",
+      {
+        method: "POST",
+        body: JSON.stringify(order),
+      }
+    );
+    if (!response.ok) {
+      throw new Error("Posting data has failed");
+    }
+  };
+
+  try {
+    sendData();
+  } catch (error) {
+    console.log(error);
+  }
+};

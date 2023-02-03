@@ -2,6 +2,7 @@ import React from "react";
 import { useSelector } from "react-redux";
 
 import styles from "./Styles.module.css";
+import { sendOrderData } from "../store/order-actions";
 
 const Confirmation = (props) => {
   const orderData = useSelector((state) => state.order);
@@ -10,6 +11,11 @@ const Confirmation = (props) => {
   const reportCount = packagesData.map((item) => {
     if (orderData.packageId === item.id) return item.reportCount;
   });
+
+  const orderCompleteHandler = () => {
+    sendOrderData(orderData);
+    props.nextPage();
+  };
 
   return (
     <div>
@@ -38,7 +44,10 @@ const Confirmation = (props) => {
           </p>
         </div>
       </div>
-      <button onClick={props.nextPage} className={styles["button-submit"]}>
+      <button
+        onClick={orderCompleteHandler}
+        className={styles["button-submit"]}
+      >
         Complete purchase
       </button>
     </div>
