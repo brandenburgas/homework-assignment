@@ -1,4 +1,4 @@
-import React, { Fragment } from "react";
+import React from "react";
 import { useSelector } from "react-redux";
 
 import styles from "./Styles.module.css";
@@ -7,17 +7,12 @@ const Confirmation = (props) => {
   const orderData = useSelector((state) => state.order);
   const packagesData = useSelector((state) => state.packages);
 
-  console.log(packagesData);
-
   const reportCount = packagesData.map((item) => {
-    if (orderData.packageId === item.id) {
-      console.log(item.reportCount);
-      return item.reportCount;
-    }
+    if (orderData.packageId === item.id) return item.reportCount;
   });
 
   return (
-    <React.Fragment>
+    <div>
       <h2 className={styles["form__container-header"]}>Review your order</h2>
       <div className={styles.form__content}>
         <div>
@@ -46,7 +41,7 @@ const Confirmation = (props) => {
       <button onClick={props.nextPage} className={styles["button-submit"]}>
         Complete purchase
       </button>
-    </React.Fragment>
+    </div>
   );
 };
 
