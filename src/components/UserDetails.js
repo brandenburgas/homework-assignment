@@ -1,88 +1,64 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { string, z } from "zod";
 
 import { useDispatch } from "react-redux";
 import { orderActions } from "../store/index";
 
 import styles from "./Styles.module.css";
 
+const schema = z.object({
+  firstName: string().min(1, { message: "Please enter a valid first name" }),
+  lastName: string().min(1, { message: "Please enter a valid last name" }),
+  email: string().email({ message: "Please enter a valid email address" }),
+});
+
 const UserDetails = (props) => {
+  const { register, handleSubmit, formState } = useForm({
+    resolver: zodResolver(schema),
+  });
+
   const dispatch = useDispatch();
-  const [formIsValid, setFormIsValid] = useState(false);
-  const [enteredFirstName, setEnteredFirstName] = useState("");
-  const [enteredLastName, setEnteredLastName] = useState("");
-  const [enteredEmail, setEnteredEmail] = useState("");
 
-  const validRegex =
-    /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+  const { errors } = formState;
 
-  const firstNameInputHandler = (e) => {
-    setEnteredFirstName(e.target.value);
-  };
-
-  const lastNameInputHandler = (e) => {
-    setEnteredLastName(e.target.value);
-  };
-
-  const emailInputHandler = (e) => {
-    setEnteredEmail(e.target.value);
-  };
-
-  const validityHandler = () => {
-    if (
-      enteredFirstName.trim().length !== 0 &&
-      enteredLastName.trim().length !== 0 &&
-      enteredEmail.match(validRegex)
-    ) {
-      setFormIsValid(true);
-    }
-  };
-
-  const formSubmitHandler = (e) => {
-    e.preventDefault();
-    if (formIsValid) {
-      dispatch(
-        orderActions.updateUserInfo({
-          firstName: enteredFirstName,
-          lastName: enteredLastName,
-          email: enteredEmail,
-        })
-      );
-      props.nextPage();
-    }
+  const formSubmitHandler = (formValues) => {
+    dispatch(
+      orderActions.updateUserInfo({
+        firstName: formValues.firstName,
+        lastName: formValues.lastName,
+        email: formValues.email,
+      })
+    );
+    props.nextPage();
   };
 
   return (
     <div>
       <h2 className={styles["form__container-header"]}>Enter your details</h2>
-      <form onSubmit={formSubmitHandler}>
+      <form
+        onSubmit={handleSubmit(formSubmitHandler)}
+        className={styles["user__input-details"]}
+      >
         <div>
           <input
-            className={styles["user__input-details"]}
-            type="text"
-            placeholder="First name"
-            onChange={firstNameInputHandler}
+            {...register("firstName")}
+            placeholder={
+              errors.firstName ? errors.firstName.message : "First name"
+            }
           />
+          <p className={styles["form-error"]}>{errors.firstName?.message}</p>
         </div>
         <div>
-          <input
-            className={styles["user__input-details"]}
-            type="text"
-            placeholder="Last name"
-            onChange={lastNameInputHandler}
-          />
+          <input {...register("lastName")} placeholder="Last name" />
+          <p className={styles["form-error"]}>{errors.lastName?.message}</p>
         </div>
         <div>
-          <input
-            className={styles["user__input-details"]}
-            type="email"
-            placeholder="E-mail"
-            onChange={emailInputHandler}
-          />
+          <input {...register("email")} placeholder="E-mail" />
+          <p className={styles["form-error"]}>{errors.email?.message}</p>
         </div>
-        <button onClick={validityHandler} className={styles["button-submit"]}>
-          Next
-        </button>
+        <button className={styles["button-submit"]}>Next</button>
       </form>
     </div>
   );
