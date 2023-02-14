@@ -7,6 +7,7 @@ import { sendOrderData } from "../store/order-actions";
 const Confirmation = (props) => {
   const orderData = useSelector((state) => state.order);
   const packagesData = useSelector((state) => state.packages);
+  const { locale } = useSelector((state) => state.locale);
 
   const reportCount = packagesData.map((item) => {
     if (orderData.packageId === item.id) return item.reportCount;
@@ -37,10 +38,10 @@ const Confirmation = (props) => {
           <p>
             {orderData.buyer.firstName} {orderData.buyer.lastName}
           </p>
-          <p>{orderData.price.amount.toLocaleString("lt-LT")} €</p>
-          <p>{orderData.price.vatAmount.toLocaleString("lt-LT")} €</p>
+          <p>{orderData.price.amount.toLocaleString(locale)} €</p>
+          <p>{orderData.price.vatAmount.toLocaleString(locale)} €</p>
           <p className={styles.gross__amount}>
-            {orderData.price.grossAmount.toLocaleString("lt-LT")} €
+            {orderData.price.grossAmount.toLocaleString(locale)} €
           </p>
         </div>
       </div>

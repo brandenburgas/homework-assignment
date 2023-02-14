@@ -7,6 +7,7 @@ import { orderActions } from "../store";
 const Packages = (props) => {
   const dispatch = useDispatch();
   const packageArr = useSelector((state) => state.packages);
+  const { locale } = useSelector((state) => state.locale);
   const [checkedValue, setCheckedValue] = useState("");
   const [formIsValid, setFormIsValid] = useState(false);
 
@@ -60,13 +61,13 @@ const Packages = (props) => {
                 {index !== 0 && (
                   <span className={styles["package__price-old"]}>
                     {(packageArr[0].price.amount * (index + 1)).toLocaleString(
-                      "lt-LT"
+                      locale
                     )}
                     €
                   </span>
                 )}
                 <span className={styles.package__price}>
-                  {item.price.amount.toLocaleString("lt-LT")}€
+                  {item.price.amount.toLocaleString(locale)}€
                 </span>
               </div>
             </div>

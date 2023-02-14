@@ -9,7 +9,7 @@ const initialState = {
   },
   vat: {
     countryCode: "",
-    rate: 0,
+    rate: "",
   },
   price: {
     currency: "",
@@ -67,8 +67,25 @@ const packageSlice = createSlice({
 export { packageSlice };
 export const packagesActions = packageSlice.actions;
 
+const localeSlice = createSlice({
+  name: "locale",
+  initialState: {},
+  reducers: {
+    getLocaleInfo(state, action) {
+      state.locale = action.payload;
+    },
+  },
+});
+
+export { localeSlice };
+export const localeActions = localeSlice.actions;
+
 const store = configureStore({
-  reducer: { order: orderSlice.reducer, packages: packageSlice.reducer },
+  reducer: {
+    order: orderSlice.reducer,
+    packages: packageSlice.reducer,
+    locale: localeSlice.reducer,
+  },
 });
 
 export default store;
