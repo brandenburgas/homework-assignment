@@ -1,54 +1,58 @@
 import React from "react";
 import { useSelector } from "react-redux";
 
-import styles from "./Styles.module.css";
-import { sendOrderData } from "../store/order-actions";
+import { useNavigate } from "react-router-dom";
 
-const Confirmation = (props) => {
-  const orderData = useSelector((state) => state.order);
-  const packagesData = useSelector((state) => state.packages);
-  const { locale } = useSelector((state) => state.locale);
+import globalStyles from "./GlobalStyles.module.css";
+import localStyles from "./Confirmation.module.css";
 
-  const reportCount = packagesData.map((item) => {
-    if (orderData.packageId === item.id) return item.reportCount;
-  });
+import { formatAmount } from "../helpers/formatAmount";
+import useLoadVATRates from "../hooks/useLoadVATRates";
+import useCompleteOrder from "../hooks/useSendOrder";
 
-  const orderCompleteHandler = () => {
-    sendOrderData(orderData);
-    props.nextPage();
+const Confirmation = () => {
+  useLoadVATRates();
+
+  const navigate = useNavigate();
+
+  const order = useSelector((state) => state.order);
+  const packages = useSelector((state) => state.packages);
+
+  const { reportCount } = packages.find((item) => order.packageId === item.id);
+
+  const { mutate } = useCompleteOrder();
+
+  const completeOrder = () => {
+    mutate(order);
+    navigate("/success");
   };
 
   return (
     <div>
-      <h2 className={styles["form__container-header"]}>Review your order</h2>
-      <div className={styles.form__content}>
-        <div>
+      <h2 className={globalStyles.header}>Review your order</h2>
+      <div className={globalStyles.content}>
+        <div className={localStyles.column}>
           <p>Package</p>
           <p>Buyer</p>
           <p>Price</p>
-          <p>VAT ({orderData.vat.rate}%)</p>
-          <p className={styles.gross__amount}>Total</p>
+          <p>VAT ({order.vat.rate}%)</p>
+          <p>Total</p>
         </div>
-        <div>
+        <div className={localStyles.column}>
           <p>
-            {orderData.packageId.slice(0, 1).toUpperCase() +
-              orderData.packageId.slice(1)}{" "}
+            {order.packageId.slice(0, 1).toUpperCase() +
+              order.packageId.slice(1)}{" "}
             ({reportCount} {reportCount === 1 ? "report" : "reports"})
           </p>
           <p>
-            {orderData.buyer.firstName} {orderData.buyer.lastName}
+            {order.buyer.firstName} {order.buyer.lastName}
           </p>
-          <p>{orderData.price.amount.toLocaleString(locale)} €</p>
-          <p>{orderData.price.vatAmount.toLocaleString(locale)} €</p>
-          <p className={styles.gross__amount}>
-            {orderData.price.grossAmount.toLocaleString(locale)} €
-          </p>
+          <p>{formatAmount(order.price.amount)}</p>
+          <p>{formatAmount(order.price.vatAmount)}</p>
+          <p>{formatAmount(order.price.grossAmount)}</p>
         </div>
       </div>
-      <button
-        onClick={orderCompleteHandler}
-        className={styles["button-submit"]}
-      >
+      <button onClick={completeOrder} className={globalStyles.button}>
         Complete purchase
       </button>
     </div>

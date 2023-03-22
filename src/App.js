@@ -1,18 +1,32 @@
-import { useEffect } from "react";
-import { useDispatch } from "react-redux";
 import "./App.css";
-import Signup from "./components/Signup";
-import { getInitialData } from "./store/order-actions";
+
+import { RouterProvider, createBrowserRouter } from "react-router-dom";
+import Packages from "./components/Packages";
+import RootLayout from "./components/RootLayout";
+import UserDetails from "./components/UserDetails";
+import Confirmation from "./components/Confirmation";
+import Success from "./components/Success";
+
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <RootLayout />,
+    children: [
+      { path: "/", element: <Packages /> },
+      { path: "/user-details", element: <UserDetails /> },
+      {
+        path: "/confirmation",
+        element: <Confirmation />,
+      },
+      { path: "/success", element: <Success /> },
+    ],
+  },
+]);
 
 function App() {
-  const dispatch = useDispatch();
-  useEffect(() => {
-    dispatch(getInitialData());
-  }, [dispatch]);
-
   return (
     <div>
-      <Signup />
+      <RouterProvider router={router} />
     </div>
   );
 }

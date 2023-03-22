@@ -1,12 +1,15 @@
-import React, { useState } from "react";
+import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { string, z } from "zod";
 
-import { useDispatch } from "react-redux";
-import { orderActions } from "../store/index";
+import { useNavigate } from "react-router-dom";
 
-import styles from "./Styles.module.css";
+import { useDispatch, useSelector } from "react-redux";
+import { orderActions } from "../store/orderSlice";
+
+import globalStyles from "./GlobalStyles.module.css";
+import localStyles from "./UserDetails.module.css";
 
 const schema = z.object({
   firstName: string().min(1, { message: "Please enter a valid first name" }),
@@ -14,7 +17,17 @@ const schema = z.object({
   email: string().email({ message: "Please enter a valid email address" }),
 });
 
-const UserDetails = (props) => {
+const UserDetails = () => {
+  const navigate = useNavigate();
+
+  const order = useSelector((state) => state.order);
+
+  const defaultFormValues = {
+    firstName: order.buyer.firstName,
+    lastName: order.buyer.lastName,
+    email: order.buyer.email,
+  };
+
   const { register, handleSubmit, formState } = useForm({
     resolver: zodResolver(schema),
   });
@@ -23,7 +36,7 @@ const UserDetails = (props) => {
 
   const { errors } = formState;
 
-  const formSubmitHandler = (formValues) => {
+  const updateUserInfo = (formValues) => {
     dispatch(
       orderActions.updateUserInfo({
         firstName: formValues.firstName,
@@ -31,34 +44,47 @@ const UserDetails = (props) => {
         email: formValues.email,
       })
     );
-    props.nextPage();
+    navigate("/confirmation");
   };
 
   return (
     <div>
-      <h2 className={styles["form__container-header"]}>Enter your details</h2>
+      <h2 className={globalStyles.header}>Enter your details</h2>
       <form
-        onSubmit={handleSubmit(formSubmitHandler)}
-        className={styles["user__input-details"]}
+        onSubmit={handleSubmit(updateUserInfo)}
+        className={localStyles.content}
       >
         <div>
           <input
             {...register("firstName")}
-            placeholder={
-              errors.firstName ? errors.firstName.message : "First name"
-            }
+            defaultValue={defaultFormValues.firstName}
+            placeholder="First name"
           />
-          <p className={styles["form-error"]}>{errors.firstName?.message}</p>
+          {errors.firstName && (
+            <p className={globalStyles.error}>{errors.firstName.message}</p>
+          )}
         </div>
         <div>
-          <input {...register("lastName")} placeholder="Last name" />
-          <p className={styles["form-error"]}>{errors.lastName?.message}</p>
+          <input
+            {...register("lastName")}
+            defaultValue={defaultFormValues.lastName}
+            placeholder="Last name"
+          />
+          {errors.lastName && (
+            <p className={globalStyles.error}>{errors.lastName.message}</p>
+          )}
         </div>
         <div>
-          <input {...register("email")} placeholder="E-mail" />
-          <p className={styles["form-error"]}>{errors.email?.message}</p>
+          <input
+            {...register("email")}
+            defaultValue={defaultFormValues.email}
+            placeholder="E-mail"
+          />
+          {errors.email && (
+            <p className={globalStyles.error}>{errors.email.message}</p>
+          )}
         </div>
-        <button className={styles["button-submit"]}>Next</button>
+        <button className={globalStyles.button}>Next</button>
       </form>
     </div>
   );
